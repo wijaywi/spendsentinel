@@ -1,5 +1,62 @@
 # SpendSentinel Progress Log
 
+## 6 November 2026 - Hackathon submission gap remediation
+
+### Gap 1: Git repository initialization - COMPLETED
+
+- Initialized local git repository at project root.
+- Verified `.gitignore` correctly excludes: `.env`, `*.db`, `__pycache__/`, `.pytest_cache/`, `*.py[cod]`, `.venv/`.
+- Confirmed no hardcoded credentials in source code or test files via grep scan.
+- Created initial commit: 61 files, 10,672 insertions across all 8 modules.
+- Sensitive files verified NOT tracked: `.env` (0 matches), `sentinel.db` (0 matches), `__pycache__/` (0 matches), `.pytest_cache/` (0 matches).
+- **Remaining action (user):** Create public GitHub/GitLab/Bitbucket repository and push. Rotate exposed PayPal Sandbox Client Secret and Gemini API key before pushing.
+
+### Gap 2: Open-source license file - COMPLETED
+
+- Added MIT License file at project root (`LICENSE`).
+- Copyright holder: "SpendSentinel Contributors", year 2026.
+- MIT License chosen for maximum permissiveness and GitHub auto-detection in repository About section.
+- Committed to git: `66e7e38 Add MIT open-source license`.
+
+### Gap 3: Credential rotation - PENDING (USER ACTION REQUIRED)
+
+- Identified exposed credentials in `.env`: PayPal Sandbox Client ID, Client Secret, and Gemini API Key.
+- `.env` is correctly excluded from git via `.gitignore` (0 tracked matches).
+- **User must manually rotate credentials:**
+  - PayPal Sandbox: Reset client secret at https://developer.payrecurring.com/dashboard/applications/sandbox
+  - Gemini API: Delete old key and create new key at https://aistudio.google.com/apikey
+  - Update `.env` with new values before recording demo video
+- No code changes required; this is an operational security step.
+
+### Gap 4: Demo video preparation - COMPLETED
+
+- Verified all 32 tests pass (47.72s runtime, deprecation warnings only).
+- Verified `python -m compileall -q app tests run.py` passes with no errors.
+- Created `RECORDING_GUIDE.md` with:
+  - Pre-recording checklist (credential rotation, app restart, manual flow testing)
+  - 7 timed scenes with exact narration scripts (total target: 2:50)
+  - Step-by-step actions for each scene (agent registration, approved purchase, denied purchase, PayPal order, approval/capture, dashboard)
+  - Desktop and browser preparation tips
+  - Post-recording editing and YouTube upload instructions
+  - Troubleshooting section for common failures (AI extraction, PayPal order, dashboard data)
+- Committed to git: `25379a6 Add video recording guide and Devpost submission package`.
+- **User must:** Record video following the guide, edit to under 3:00, upload to YouTube as public.
+
+### Gap 5: Devpost submission preparation - COMPLETED
+
+- Created `SUBMISSION_PACKAGE.md` with:
+  - Complete project description text (ready to copy-paste into Devpost form)
+  - Submission requirements checklist
+  - Step-by-step Devpost submission instructions
+  - Testing access guide for judges (sandbox credentials, API keys, setup steps)
+  - Judging criteria reference with tie-breaking order
+  - Common mistakes to avoid
+  - Final submission checklist
+- Committed to git: `25379a6 Add video recording guide and Devpost submission package`.
+- **User must:** Create public GitHub/GitLab/Bitbucket repo, push code, register at paypalaihackathon.devpost.com, fill submission form using the package, submit before November 12, 2026 12:00 PM PT.
+
+---
+
 ## 3 November 2026 - Service audit remediation
 
 ### Completed
