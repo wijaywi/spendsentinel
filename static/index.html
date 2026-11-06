@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpendSentinel - AI-Agent Commerce Guard</title>
+    <style>
+        :root {
+            --primary: #0070ba;
+            --secondary: #003087;
+            --accent: #00cf92;
+            --bg: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-main: #0c0c0d;
+            --text-muted: #5e6573;
+            --border: #e1e7ec;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .badge {
+            background-color: var(--accent);
+            color: #003087;
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            width: 100%;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero h1 {
+            font-size: 2.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1.25rem;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            background: #ffffff;
+        }
+
+        .workbench {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .workbench .card { min-width: 0; }
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.85rem;
+        }
+        label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        input, textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.65rem 0.75rem;
+            color: var(--text-main);
+            background: #fff;
+            font: inherit;
+        }
+        input:focus, textarea:focus {
+            outline: 2px solid rgba(0, 112, 186, 0.22);
+            border-color: var(--primary);
+        }
+        .wide { grid-column: 1 / -1; }
+        button {
+            border: 0;
+            border-radius: 6px;
+            padding: 0.72rem 1rem;
+            background: var(--primary);
+            color: #fff;
+            font: inherit;
+            font-weight: 650;
+            cursor: pointer;
+        }
+        button:hover { background: var(--secondary); }
+        button:disabled { opacity: 0.6; cursor: wait; }
+        .result {
+            margin-top: 1rem;
+            border-radius: 6px;
+            padding: 0.85rem;
+            background: #f5f7fa;
+            border: 1px solid var(--border);
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            font: 0.82rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+            max-height: 360px;
+            overflow: auto;
+        }
+        .approval-link {
+            display: inline-block;
+            margin-top: 0.75rem;
+            color: var(--secondary);
+            font-weight: 650;
+            overflow-wrap: anywhere;
+        }
+        .notice {
+            padding: 0.9rem 1rem;
+            margin: 0 0 1.5rem;
+            border-left: 4px solid #d59b00;
+            background: #fff8df;
+            color: #584600;
+            line-height: 1.45;
+            border-radius: 4px;
+        }
+        .section-title {
+            margin: 2rem 0 0.25rem;
+            color: var(--secondary);
+            font-size: 1.35rem;
+        }
+        .muted { color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; }
+        @media (max-width: 560px) {
+            header { padding: 1rem; }
+            .header-content { gap: 0.75rem; align-items: flex-start; flex-direction: column; }
+            main { margin: 1.25rem auto; padding: 0 1rem; }
+            .hero h1 { font-size: 1.8rem; }
+            .modules-grid, .workbench { grid-template-columns: 1fr; }
+            .field-grid { grid-template-columns: 1fr; }
+            .wide { grid-column: auto; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">SpendSentinel</div>
+            <div class="badge">Independent Hackathon Prototype</div>
+        </div>
+    </header>
+
+    <main>
+        <div class="hero">
+            <h1>Merchant Protection Platform</h1>
+            <p>AI purchase understanding, deterministic agent spending controls, and PayPal sandbox checkout.</p>
+        </div>
+
+        <div class="notice" role="note">
+            Prototype only. PayPal checkout is sandbox-only and uses a separate explicit request; the AI does not authorize or capture
+            payments. SpendSentinel is independent and is not an official PayPal product. Validation is not authoritative sanctions screening
+            or account verification. Use synthetic data only.
+        </div>
+
+        <div class="modules-grid">
+            <div class="card">
+                <span class="card-tag">Module 1</span>
+                <h2>Pre-Transaction Validation</h2>
+                <p>Checks payment instruction syntax, currency and corridor heuristics. It cannot confirm account ownership or availability.</p>
+                <div class="status-pill">
+                    <span class="status-dot"></span>
+                    <span>Available</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <span class="card-tag">Module 2</span>
+                <h2>Agent Guard</h2>
+                <p>Evaluates agent purchase requests against amount, currency, merchant, velocity, idempotency and daily budget rules.</p>
+                <div class="status-pill">
+                    <span class="status-dot"></span>
+                    <span>Available</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <span class="card-tag">Module 3</span>
+                <h2>Evidence Vault</h2>
+                <p>Evidence and dispute tools are exposed through the API. Do not collect sensitive fingerprints without a lawful basis.</p>
+                <div class="status-pill">
+                    <span class="status-dot"></span>
+                    <span>API</span>
+                </div>
+
+                <h2 class="section-title">Payment instruction check</h2>
+                <p class="muted">Syntax and local heuristic checks only. The result is not proof that a transfer will succeed.</p>
+                <section class="workbench" aria-label="Payment and agent tools">
+                    <div class="card">
+                        <form id="payment-form">
+                            <div class="field-grid">
+                                <label>Sender country<input name="sender_country" value="US" maxlength="2" required></label>
+                                <label>Recipient country<input name="recipient_country" value="DE" maxlength="2" required></label>
+                                <label class="wide">Recipient name<input name="recipient_name" value="Example GmbH" required></label>
+                                <label class="wide">IBAN, if applicable<input name="iban" placeholder="DE89370400440532013000"></label>
+                                <label>SWIFT/BIC<input name="bic" placeholder="DEUTDEFF"></label>
+                                <label>Currency<input name="currency" value="EUR" maxlength="3" required></label>
+                                <label>Amount<input name="amount" type="number" min="0.01" step="any" value="1250.50" required></label>
+                                <label class="wide">Payment reference<input name="reference" value="INV-100" required></label>
+                                <div class="wide"><button type="submit">Validate instruction</button></div>
+                            </div>
+                        </form>
+                        <pre id="payment-result" class="result" aria-live="polite">Result will appear here.</pre>
+                    </div>
+
+                    <div class="card">
+                        <span class="card-tag">Agent policy</span>
+                        <h2>Register a demo agent</h2>
+                        <p class="muted">Policy limits use a single budget currency. Owner ID is not authentication in this prototype.</p>
+                        <form id="agent-form">
+                            <div class="field-grid">
+                                <label>Agent ID<input name="agent_id" value="demo_agent" required></label>
+                                <label>Agent name<input name="name" value="Demo purchasing agent" required></label>
+                                <label>Owner ID<input name="owner_id" value="demo_owner" required></label>
+                                <label>Budget currency<input name="budget_currency" value="USD" maxlength="3" required></label>
+                                <label>Max per transaction<input name="max_transaction_amount" type="number" min="0.01" step="any" value="50" required></label>
+                                <label>Daily spending cap<input name="daily_spending_limit" type="number" min="0.01" step="any" value="100" required></label>
+                                <label class="wide">Allowed currencies, comma-separated<input name="allowed_currencies" value="USD,EUR" required></label>
+                                <label class="wide">Allowed merchants, optional<input name="allowed_merchants" placeholder="Leave empty to allow all"></label>
+                                <div class="wide"><button type="submit">Register agent</button></div>
+                            </div>
+                        </form>
+                        <pre id="agent-result" class="result" aria-live="polite">Agent registration result will appear here.</pre>
+                    </div>
+
+                    <div class="card">
+                        <span class="card-tag">Agent policy</span>
+                        <h2>Evaluate a purchase</h2>
+                        <p class="muted">An approval is a policy decision only. It does not execute a payment.</p>
+                        <form id="evaluate-form">
+                            <div class="field-grid">
+                                <label>Agent ID<input name="agent_id" value="demo_agent" required></label>
+                                <label>Idempotency key<input name="idempotency_key" required></label>
+                                <label>Amount<input name="amount" type="number" min="0.01" step="any" value="25" required></label>
+                                <label>Currency<input name="currency" value="USD" maxlength="3" required></label>
+                                <label>Merchant ID<input name="merchant_id" value="merchant_demo" required></label>
+                                <label>MCC, optional<input name="category_mcc" inputmode="numeric" maxlength="4" placeholder="5732"></label>
+                                <label class="wide">Purchase description<input name="description" value="Synthetic software purchase"></label>
+                                <div class="wide"><button type="submit">Evaluate request</button></div>
+                            </div>
+                        </form>
+                        <pre id="evaluate-result" class="result" aria-live="polite">Decision will appear here.</pre>
+                    </div>
+
+                    <div class="card">
+                        <span class="card-tag">AI + Agent Guard</span>
+                        <h2>Describe a purchase</h2>
+                        <p class="muted">The configured AI model extracts a proposal. Deterministic agent policies make the decision; AI output cannot approve a payment.</p>
+                        <form id="intent-form">
+                            <div class="field-grid">
+                                <label>Agent ID<input name="agent_id" value="demo_agent" required></label>
+                                <label>Trusted merchant ID<input name="merchant_id" value="merchant_demo" required></label>
+                                <label class="wide">Unique idempotency key<input name="idempotency_key" required></label>
+                                <label class="wide">Purchase instruction<textarea name="instruction" rows="3" minlength="5" maxlength="1000" required>Buy printer paper for $24.50 from Office Supply</textarea></label>
+                                <div class="wide"><button type="submit">Extract and evaluate</button></div>
+                            </div>
+                        </form>
+                        <pre id="intent-result" class="result" aria-live="polite">AI extraction and policy decision will appear here.</pre>
+                    </div>
+
+                    <div class="card">
+                        <span class="card-tag">Monitoring</span>
+                        <h2>Dashboard summary</h2>
+                        <p class="muted">Aggregated local prototype counts. Refresh to load current database values.</p>
+                        <button id="refresh-dashboard" type="button">Refresh dashboard</button>
+                        <pre id="dashboard-result" class="result" aria-live="polite">Dashboard data will appear here.</pre>
+                    </div>
+
+                    <div class="card">
+                        <span class="card-tag">PayPal Sandbox</span>
+                        <h2>Test checkout</h2>
+                        <p class="muted">Create a sandbox order, approve it with a PayPal Personal sandbox account, then explicitly capture the approved order. No live funds are used.</p>
+                        <form id="paypal-order-form">
+                            <div class="field-grid">
+                                <label>Amount<input name="amount" type="number" min="0.01" step="any" value="12.50" required></label>
+                                <label>Currency<input name="currency" value="USD" maxlength="3" required></label>
+                                <label class="wide">Reference<input name="reference_id" value="demo-invoice-100" maxlength="64" required></label>
+                                <label class="wide">Unique order request ID<input name="request_id" required></label>
+                                <label class="wide">Description<input name="description" value="Synthetic demo purchase" maxlength="127"></label>
+                                <div class="wide"><button type="submit">Create sandbox order</button></div>
+                            </div>
+                        </form>
+                        <a id="paypal-approval-link" class="approval-link" hidden target="_blank" rel="noopener noreferrer">Open PayPal sandbox approval</a>
+                        <pre id="paypal-order-result" class="result" aria-live="polite">Order response will appear here.</pre>
+                        <h2 class="section-title">Capture approved order</h2>
+                        <p class="muted">Only use this after the sandbox buyer has approved the order.</p>
+                        <form id="paypal-capture-form">
+                            <div class="field-grid">
+                                <label class="wide">PayPal order ID<input name="order_id" required></label>
+                                <label class="wide">Unique capture request ID<input name="request_id" required></label>
+                                <div class="wide"><button type="submit">Capture approved sandbox order</button></div>
+                            </div>
+                        </form>
+                        <pre id="paypal-capture-result" class="result" aria-live="polite">Capture response will appear here.</pre>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>SpendSentinel v1.0.0 &copy; 2026. Independent local prototype. Uses PayPal Sandbox APIs. Use synthetic data only.</p>
+    </footer>
+    <script>
+        const api = async (path, options = {}) => {
+            const response = await fetch(path, {
+                ...options,
+                headers: { "Content-Type": "application/json", ...(options.headers || {}) }
+            });
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                const detail = typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail || body);
+                throw new Error(detail || `Request failed (${response.status})`);
+            }
+            return body;
+        };
+        const show = (id, value) => {
+            document.getElementById(id).textContent = JSON.stringify(value, null, 2);
+        };
+        const formData = (form) => Object.fromEntries(new FormData(form).entries());
+        const bindForm = (formId, resultId, handler) => {
+            document.getElementById(formId).addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const form = event.currentTarget;
+                const button = form.querySelector("button[type=submit]");
+                button.disabled = true;
+                try {
+                    show(resultId, await handler(formData(form)));
+                } catch (error) {
+                    show(resultId, { error: error.message });
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        };
+        bindForm("payment-form", "payment-result", (data) => api("/api/validation/validate", {
+            method: "POST",
+            body: JSON.stringify({
+                ...data,
+                amount: Number(data.amount),
+                iban: data.iban || null,
+                bic: data.bic || null
+            })
+        }));
+        bindForm("agent-form", "agent-result", (data) => api("/api/agents/register", {
+            method: "POST",
+            body: JSON.stringify({
+                agent_id: data.agent_id,
+                name: data.name,
+                owner_id: data.owner_id,
+                budget_currency: data.budget_currency,
+                max_transaction_amount: data.max_transaction_amount,
+                daily_spending_limit: data.daily_spending_limit,
+                allowed_currencies: data.allowed_currencies.split(",").map((value) => value.trim()).filter(Boolean),
+                allowed_merchants: data.allowed_merchants.split(",").map((value) => value.trim()).filter(Boolean)
+            })
+        }));
+        bindForm("evaluate-form", "evaluate-result", (data) => api("/api/agents/evaluate", {
+            method: "POST",
+            body: JSON.stringify({
+                ...data,
+                amount: Number(data.amount),
+                category_mcc: data.category_mcc || null
+            })
+        }));
+        bindForm("intent-form", "intent-result", async (data) => {
+            const result = await api("/api/agents/interpret-and-evaluate", {
+                method: "POST",
+                body: JSON.stringify(data)
+            });
+            if (result.decision && result.decision.decision === "APPROVE") {
+                const intent = result.extracted_intent;
+                const paypalForm = document.getElementById("paypal-order-form");
+                paypalForm.elements.amount.value = intent.amount;
+                paypalForm.elements.currency.value = intent.currency;
+                paypalForm.elements.reference_id.value =
+                    `sentinel-${data.agent_id}-${data.idempotency_key}`.slice(0, 64);
+                paypalForm.elements.request_id.value =
+                    `sentinel-order-${crypto.randomUUID()}`;
+                paypalForm.elements.description.value = intent.description;
+                document.getElementById("paypal-order-result").textContent =
+                    "Agent Guard approved this proposal. Review the sandbox order details, then explicitly create the PayPal order.";
+                document.getElementById("paypal-order-form").scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+            }
+            return result;
+        });
+        bindForm("paypal-order-form", "paypal-order-result", async (data) => {
+            const result = await api("/api/payments/orders", {
+                method: "POST",
+                body: JSON.stringify({
+                    ...data,
+                    amount: data.amount,
+                    description: data.description || null
+                })
+            });
+            const approval = (result.links || []).find((link) => link.rel === "approve");
+            const approvalLink = document.getElementById("paypal-approval-link");
+            approvalLink.hidden = true;
+            if (approval && typeof approval.href === "string") {
+                const url = new URL(approval.href);
+                if (url.protocol === "https:" && url.hostname === "www.sandbox.paypal.com") {
+                    approvalLink.href = url.href;
+                    approvalLink.hidden = false;
+                }
+            }
+            return result;
+        });
+        bindForm("paypal-capture-form", "paypal-capture-result", (data) => api(
+            `/api/payments/orders/${encodeURIComponent(data.order_id)}/capture`,
+            {
+                method: "POST",
+                headers: { "PayPal-Request-Id": data.request_id }
+            }
+        ));
+        document.getElementById("refresh-dashboard").addEventListener("click", async (event) => {
+            const button = event.currentTarget;
+            button.disabled = true;
+            try {
+                show("dashboard-result", await api("/api/dashboard/summary"));
+            } catch (error) {
+                show("dashboard-result", { error: error.message });
+            } finally {
+                button.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
