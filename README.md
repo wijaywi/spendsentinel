@@ -1,5 +1,7 @@
 # SpendSentinel
 
+![SpendSentinel logo](spendsentinel_logo.png)
+
 SpendSentinel is a prototype for safer AI-agent commerce. A configured AI model extracts purchase intent from natural language; a deterministic spending-policy engine then approves, denies, or escalates the resulting proposal. Approved evaluations can be followed by a separately initiated PayPal Orders API sandbox checkout. The model never authorizes or captures a payment. 
 
 ## project description
