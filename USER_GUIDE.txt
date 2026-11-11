@@ -1,0 +1,265 @@
+SPENDSENTINEL - LOCAL USER GUIDE
+================================
+
+This guide explains how to start the SpendSentinel demo and use its dashboard.
+The application is a local prototype. Use synthetic data only. PayPal calls are
+Sandbox-only; this application is not an official PayPal product or a
+production payment, identity, or compliance system.
+
+
+1. REQUIREMENTS
+---------------
+
+- Windows with Python installed.
+- A terminal such as PowerShell.
+- Internet access to install Python packages.
+- Optional: a Google AI Studio API key or a running local OpenAI-compatible
+  model for the "Describe a purchase" feature.
+- Optional: PayPal Sandbox REST app credentials and Sandbox test accounts for
+  checkout, buyer approval, and capture.
+
+
+2. INSTALL AND START THE APPLICATION
+------------------------------------
+
+Open PowerShell in the project folder, the folder that contains run.py and
+requirements.txt. For example, in this worktree:
+
+  cd "D:\zzzzzzzzzzz AntiGravity\copilot-worktrees\Paypal Advance\devopspisex-expert-enigma"
+
+Install dependencies:
+
+  python -m pip install -r requirements.txt
+
+Start the application:
+
+  python run.py
+
+Keep this terminal open while using the app. Open the dashboard in a browser:
+
+  http://127.0.0.1:8000/
+
+The API health check is at:
+
+  http://127.0.0.1:8000/health
+
+Interactive API documentation is at:
+
+  http://127.0.0.1:8000/docs
+
+IMPORTANT: Start the server from the intended project folder. If port 8000 is
+already serving another copy of the project, stop that server in its own
+terminal with Ctrl+C, then start this copy from the correct folder. The HTML
+page and the server must come from the same checkout.
+
+To stop the server, press Ctrl+C in the terminal running it.
+
+
+3. OPTIONAL AI CONFIGURATION
+----------------------------
+
+The dashboard's "Describe a purchase" form requires an AI provider. It will
+return "AI intent extraction is not configured" when AI_ENABLED is false.
+The AI extracts purchase details only; Agent Guard makes the policy decision.
+AI does not approve payments or create PayPal orders.
+
+Create a local .env file in the same project folder as run.py. You can copy
+.env.example as a starting point:
+
+  Copy-Item .env.example .env
+
+Edit .env and configure an AI provider. For Google Gemini, use a supported
+model available to your Google AI Studio project:
+
+  AI_ENABLED=true
+  AI_API_URL=https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+  AI_ALLOWED_HOSTS=["generativelanguage.googleapis.com"]
+  AI_MODEL=YOUR_SUPPORTED_GEMINI_MODEL
+  AI_API_KEY=YOUR_GOOGLE_AI_STUDIO_API_KEY
+
+Replace the model and key placeholders with your own values. Do not share or
+commit API keys. Restart the server after changing .env; settings are loaded
+when the application starts.
+
+Alternatively, a local OpenAI-compatible server such as LM Studio can be used.
+Start the local model server, then set AI_ENABLED=true, AI_API_URL to its
+loopback chat-completions URL (for example
+http://127.0.0.1:1234/v1/chat/completions), and AI_MODEL to the exact model ID
+served by that local server. A local server usually does not need AI_API_KEY.
+
+If AI is not configured, use "Evaluate a purchase" to test deterministic
+policy evaluation without AI.
+
+
+4. REGISTER AN AGENT
+--------------------
+
+On the dashboard, find the "Register a demo agent" card. Fill in:
+
+- Agent ID: an identifier for the agent, for example demo_agent.
+- Agent name: a descriptive name.
+- Owner ID: a demo owner identifier.
+- Budget currency: for example USD.
+- Max per transaction: the highest amount one request may spend.
+- Daily spending cap: the total amount allowed per UTC day. It must be at
+  least as high as the per-transaction limit.
+- Allowed currencies: comma-separated ISO currency codes, for example USD,EUR.
+  The budget currency must be included.
+- Allowed merchants: optional comma-separated merchant IDs. Leave empty to
+  allow any merchant.
+
+Click "Register agent" and read the response below the form. Keep the Agent ID;
+you must use the same ID in evaluation forms. If the ID is already registered,
+choose another ID or use the existing agent.
+
+
+5. EVALUATE A PURCHASE WITHOUT AI
+---------------------------------
+
+Find the "Evaluate a purchase" card. This form does not require an AI key.
+
+1. Enter the registered Agent ID.
+2. Enter a new, unique Idempotency key for this request, for example
+   purchase-20261111-001. Use a different key for each new request. Reusing a
+   key with different purchase data can cause a denial.
+3. Enter the purchase amount and currency.
+4. Enter the Merchant ID. It must match the agent's merchant allowlist if one
+   was configured.
+5. MCC and description are optional.
+6. Click "Evaluate request".
+7. Read the result below the form. APPROVE means the proposal passed the
+   configured agent policies. DENY means one or more rules rejected it.
+   ESCALATE means human review is required.
+
+An APPROVE result is only a policy decision. It does not charge money, create
+an order, or approve a PayPal checkout.
+
+
+6. DESCRIBE A PURCHASE WITH AI
+------------------------------
+
+First configure AI as described in section 3 and register an agent.
+
+1. In "Describe a purchase", enter the registered Agent ID.
+2. Enter the trusted Merchant ID that should be used for policy evaluation.
+3. Enter a new, unique Idempotency key.
+4. Describe the intended purchase in the instruction box, for example:
+   "Buy printer paper for $24.50 from Office Supply".
+5. Click "Extract and evaluate".
+6. Read the result under the form. It includes the extracted proposal and the
+   separate deterministic Agent Guard decision.
+
+AI extraction is not itself an approval. Agent Guard may return APPROVE, DENY,
+or ESCALATE based on the registered agent's limits and rules. If the decision
+is APPROVE, the page fills the "Test checkout" form and scrolls to it. The user
+must still review the details and explicitly create any PayPal order.
+
+
+7. OPTIONAL PAYMENT-INSTRUCTION VALIDATION
+-------------------------------------------
+
+The "Validate a payment instruction" form checks payment details; it is
+separate from agent evaluation and PayPal checkout.
+
+1. Enter sender and recipient countries, recipient name, currency, amount, and
+   payment reference.
+2. IBAN and SWIFT/BIC are optional when they do not apply.
+3. Click "Validate instruction".
+4. Review the result below the form.
+
+Use synthetic names and payment details only.
+
+
+8. PAYPAL SANDBOX CHECKOUT, BUYER APPROVAL, AND CAPTURE
+-------------------------------------------------------
+
+Checkout is optional. It requires a PayPal REST app in the Sandbox environment.
+Do not use Live credentials. The application cannot create a Sandbox order
+until its settings are configured.
+
+Create or use a Sandbox REST app in the PayPal Developer Dashboard. Put the
+following settings in the same .env file used by the running server:
+
+  PAYPAL_SANDBOX_ENABLED=true
+  PAYPAL_API_BASE_URL=https://api-m.sandbox.paypal.com
+  PAYPAL_CLIENT_ID=YOUR_SANDBOX_CLIENT_ID
+  PAYPAL_CLIENT_SECRET=YOUR_SANDBOX_CLIENT_SECRET
+
+Keep the client secret private. Save .env and restart the server. The
+PAYPAL_WEBHOOK_ID setting is optional for the basic create, buyer-approval,
+and capture flow; a webhook is not needed for this demonstration.
+
+To create and capture an order:
+
+1. In "Test checkout", review or enter the amount, currency, reference,
+   description, and a unique "Unique order request ID". This is an
+   idempotency key for creating the order; use a new value for each new order.
+   If an AI-assisted purchase receives APPROVE, these fields are prefilled,
+   including the request ID.
+2. Click "Create sandbox order". Read the response below the form. If PayPal
+   returns an approval link, click "Open PayPal sandbox approval".
+3. Sign in at PayPal Sandbox using a Personal Sandbox buyer test account and
+   approve the order. Do not use a real PayPal account.
+4. Return to the application. Copy the order ID from the order response (the
+   value of the "id" field).
+5. In "Capture approved order", paste that value into "PayPal order ID".
+6. Enter a new, unique "Unique capture request ID" and click
+   "Capture approved sandbox order".
+7. Read the capture response below the form. Capture is only allowed after
+   the Sandbox buyer has approved the order.
+
+Creating an order does not capture it. Buyer approval and capture are separate
+steps, and an AI or policy APPROVE decision does not perform either step.
+
+
+9. DASHBOARD SUMMARY
+--------------------
+
+Use the "Refresh dashboard" button in the "Dashboard summary" card to fetch
+current aggregate counts from the local application database. The result is
+shown below the button.
+
+
+10. COMMON ERRORS
+-----------------
+
+"AI intent extraction is not configured"
+  AI_ENABLED is not true in the .env file loaded by the running server. Check
+  that .env is beside run.py in the server's working project folder, configure
+  the AI provider, and restart the server.
+
+"AI_API_KEY is required for a remote AI provider"
+  Add a valid provider key to .env. Do not paste the key into chat or public
+  documentation. A local loopback model may not need a key.
+
+"PayPal sandbox integration is disabled"
+  Set PAYPAL_SANDBOX_ENABLED=true and configure the Sandbox Client ID and
+  Client Secret in the server's .env file, then restart the server.
+
+"Agent ... already registered"
+  Use the previously registered Agent ID or register a new ID.
+
+DENY or ESCALATE from Agent Guard
+  Read the violations in the response. Check that the amount is within both
+  transaction and daily limits, the currency is allowed, the merchant is
+  allowed, and a new Idempotency key is used. ESCALATE means review is needed;
+  it is not an approval.
+
+The dashboard does not reflect the file you changed
+  Confirm which project folder the server was started from. Edit that
+  checkout's .env and static/index.html, and restart the server from that same
+  folder.
+
+
+SAFETY NOTES
+------------
+
+- Use synthetic data only.
+- Never commit .env files, API keys, client secrets, or real personal/payment
+  data.
+- Use only PayPal Sandbox credentials and Sandbox test accounts.
+- An AI extraction or Agent Guard APPROVE is not a payment authorization.
+- A PayPal order is not captured until a Sandbox buyer approves it and the
+  capture request is explicitly submitted.
+- This local demo is not designed to be exposed publicly or used for real
+  transactions.

@@ -1,8 +1,8 @@
 # SpendSentinel
 
-SpendSentinel is a hackathon prototype for safer AI-agent commerce. A configured AI model extracts purchase intent from natural language; a deterministic spending-policy engine then approves, denies, or escalates the resulting proposal. Approved evaluations can be followed by a separately initiated PayPal Orders API sandbox checkout. The model never authorizes or captures a payment. SpendSentinel is an independent project and is not an official PayPal product.
+SpendSentinel is a prototype for safer AI-agent commerce. A configured AI model extracts purchase intent from natural language; a deterministic spending-policy engine then approves, denies, or escalates the resulting proposal. Approved evaluations can be followed by a separately initiated PayPal Orders API sandbox checkout. The model never authorizes or captures a payment. 
 
-## Hackathon project description
+## project description
 
 AI agents can understand purchase requests, but merchants need predictable controls before those agents spend money. Sentinel turns a buyer's natural-language purchase instruction into a structured proposal, checks that proposal against an agent's merchant, currency, per-transaction, and daily spending policies, and returns an auditable decision. PayPal Orders API sandbox support demonstrates the checkout path without enabling live transactions.
 
@@ -80,7 +80,7 @@ The daily limit and per-transaction limit are denominated in `budget_currency`. 
 pytest -q
 ```
 
-## Hackathon submission readiness
+## Readiness
 
 - **Working prototype:** local setup and run instructions are provided above; the AI extraction route requires an AI provider key, and PayPal checkout requires sandbox credentials.
 - **Tools disclosure:** FastAPI/Python, PayPal Orders REST API sandbox, and the configured OpenAI-compatible AI model are used. Select and identify the actual model/provider used for the demo in the final submission.
