@@ -91,7 +91,7 @@ pytest -q
 - **Eligibility and ownership:** the entrant must independently confirm eligibility, authority to submit for any team, ownership/originality, and the right to use any third-party APIs, models, and assets under their applicable terms.
 - **Submission timing:** the supplied rules state that submissions close Thursday, November 12, 2026 at 12:00 p.m. Pacific Time.
 
-### Draft submission description
+### Submission description
 
 > **SpendSentinel: Guardrails for AI-Agent Commerce**
 >
@@ -99,6 +99,4 @@ pytest -q
 >
 > The prototype uses PayPal Orders REST API in Sandbox and an OpenAI-compatible model endpoint (the included local configuration targets LM Studio). It is a demonstration, not a production payment, identity, or compliance system. No live PayPal credentials or real funds are used.
 
-### Demo video
 
-The user-friendly plain-text storyboard and English narration in [`SpendSentinel_Video_Script.txt`](SpendSentinel_Video_Script.txt) target 2:50, below the three-minute maximum. Record only after the configured Gemini model and sandbox checkout flow have been tested. If the real PayPal order/approval/capture flow cannot be demonstrated, do not imply that it was completed in the video; show only the parts that work.
